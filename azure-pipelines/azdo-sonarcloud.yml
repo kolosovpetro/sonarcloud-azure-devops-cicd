@@ -1,3 +1,11 @@
+resources:
+  repositories:
+    - repository: moviesRepo
+      type: github
+      name: kolosovpetro/movies-api-deployments-linux-iis-k8s-etc
+      endpoint: github
+      ref: refs/heads/master
+
 trigger:
   batch: true
   branches:
@@ -33,7 +41,7 @@ stages:
           vmImage: 'ubuntu-latest'
 
         steps:
-          - checkout: git://github.com/kolosovpetro/movies-api-deployments-linux-iis-k8s-etc
+          - checkout: moviesRepo
             fetchDepth: 0
 
           - task: gitversion-setup@4.5.0

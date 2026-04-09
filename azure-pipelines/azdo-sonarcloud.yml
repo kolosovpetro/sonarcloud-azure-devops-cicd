@@ -73,7 +73,7 @@ stages:
               restoreArguments: '--locked-mode'
               arguments: '--verbosity minimal'
 
-          - task: SonarCloudPrepare@3
+          - task: SonarCloudPrepare@4
             inputs:
               SonarCloud: SonarCloud_Service_Connection
               organization: kolosovpetro
@@ -92,10 +92,10 @@ stages:
               projects: '$(solution)'
               arguments: '-p:Version=$(version_step.semVer) --configuration $(buildConfiguration) --no-restore'
 
-          - task: SonarCloudAnalyze@3
+          - task: SonarCloudAnalyze@4
             inputs: {}
 
-          - task: SonarCloudPublish@3
+          - task: SonarCloudPublish@4
             inputs:
               pollingTimeoutSec: "300"
 

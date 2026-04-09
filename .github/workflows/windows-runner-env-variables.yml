@@ -1,0 +1,41 @@
+﻿name: Run on hosted Windows
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  watch-env-vars:
+    name: Run on hosted Windows
+    runs-on: windows-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v3
+        
+      - name: Print variables
+        run: |
+          echo "GITHUB_WORKFLOW: $env:GITHUB_WORKFLOW"
+          echo "GITHUB_ACTION: $env:GITHUB_ACTION"
+          echo "GITHUB_ACTOR: $env:GITHUB_ACTOR"
+          echo "GITHUB_REPOSITORY: $env:GITHUB_REPOSITORY"
+          echo "GITHUB_EVENT_NAME: $env:GITHUB_EVENT_NAME"
+          echo "GITHUB_EVENT_PATH: $env:GITHUB_EVENT_PATH"
+          echo "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
+          echo "GITHUB_SHA: $env:GITHUB_SHA"
+          echo "GITHUB_REF: $env:GITHUB_REF"
+          echo "GITHUB_HEAD_REF: $env:GITHUB_HEAD_REF"
+          echo "GITHUB_BASE_REF: $env:GITHUB_BASE_REF"
+          echo "GITHUB_SERVER_URL: $env:GITHUB_SERVER_URL"
+          echo "GITHUB_API_URL: $env:GITHUB_API_URL"
+          echo "GITHUB_GRAPHQL_URL: $env:GITHUB_GRAPHQL_URL"
+          echo "RUNNER_OS: $env:RUNNER_OS"
+          echo "RUNNER_TOOL_CACHE: $env:RUNNER_TOOL_CACHE"
+          echo "RUNNER_TEMP: $env:RUNNER_TEMP"
+          echo "RUNNER_WORKSPACE: $env:RUNNER_WORKSPACE"
+          echo "RUN NUMBER: $env:GITHUB_RUN_NUMBER"
+          echo "PATH: $env:GITHUB_PATH"

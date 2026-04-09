@@ -1,0 +1,101 @@
+resources:
+  repositories:
+    - repository: MoviesAPI
+      type: github
+      endpoint: kolosovpetro
+      name: kolosovpetro/MoviesAPI
+
+trigger:
+  - master
+
+variables:
+  - name: 'vmImageName'
+    value: 'windows-latest'
+
+  - name: 'System.Debug'
+    value: 'true'
+
+  - name: 'buildPlatform'
+    value: 'Any CPU'
+
+  - name: 'buildConfiguration'
+    value: 'Release'
+
+  - name: StageName
+    value: 'Windows_SelfHosted_Agent_Research'
+
+stages:
+  - stage: ${{ variables.StageName }}
+    displayName: ${{ variables.StageName }}
+    jobs:
+      - deployment: ${{ variables.StageName }}
+        displayName: ${{ variables.StageName }}
+        environment:
+          name: windows_selfhosted_agent
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: MoviesAPI
+                  fetchDepth: 0
+
+                - task: UseDotNet@2
+                  displayName: 'Install .NET 6.x SDK'
+                  inputs:
+                    packageType: sdk
+                    version: 6.x
+
+                - task: DotNetCoreCLI@2
+                  displayName: 'Dotnet Restore'
+                  inputs:
+                    command: 'restore'
+                    projects: '$(System.DefaultWorkingDirectory)/MoviesAPI.sln'
+                    restoreArguments: '--locked-mode'
+                    arguments: '--verbosity minimal'
+
+                - task: DotNetCoreCLI@2
+                  displayName: 'Dotnet build $(buildConfiguration)'
+                  inputs:
+                    command: 'build'
+                    projects: '$(System.DefaultWorkingDirectory)/MoviesAPI.sln'
+                    arguments: '--configuration $(buildConfiguration) --no-restore'
+
+                - task: DotNetCoreCLI@2
+                  displayName: 'Dotnet Publish'
+                  inputs:
+                    command: 'publish'
+                    publishWebProjects: false
+                    projects: '$(System.DefaultWorkingDirectory)/MoviesAPI.Core/MoviesAPI.Core.csproj'
+                    arguments: '-c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/$(buildConfiguration) --no-build'
+
+                - task: PublishBuildArtifacts@1
+                  displayName: 'Publish Artifacts'
+                  inputs:
+                    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+                    ArtifactName: 'drop'
+                    publishLocation: 'Container'
+
+                - script: |
+                    echo "Agent.BuildDirectory: $(Agent.BuildDirectory)"
+                    dir $(Agent.BuildDirectory)
+                    echo "Finish print Agent.BuildDirectory"
+                  displayName: 'Print Agent.BuildDirectory'
+
+                - script: |
+                    echo "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+                    dir $(System.DefaultWorkingDirectory)
+                    echo "Finish print System.DefaultWorkingDirectory"
+                  displayName: 'Print System.DefaultWorkingDirectory'
+
+                - script: |
+                    echo "Build.ArtifactStagingDirectory: $(Build.ArtifactStagingDirectory)"
+                    dir $(Build.ArtifactStagingDirectory)
+                    echo "Finish print Build.ArtifactStagingDirectory"
+                  displayName: 'Print Build.ArtifactStagingDirectory'
+
+                - script: |
+                    echo "Common.TestResultsDirectory: $(Common.TestResultsDirectory)"
+                    dir $(Common.TestResultsDirectory)
+                    echo "Finish print Common.TestResultsDirectory"
+                  displayName: 'Print Common.TestResultsDirectory'

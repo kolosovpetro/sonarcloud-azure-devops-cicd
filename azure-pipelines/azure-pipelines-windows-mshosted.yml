@@ -1,0 +1,91 @@
+resources:
+  repositories:
+    - repository: MoviesAPI
+      type: github
+      endpoint: kolosovpetro
+      name: kolosovpetro/MoviesAPI
+
+trigger:
+  - master
+
+variables:
+  - name: 'vmImageName'
+    value: 'windows-latest'
+
+  - name: 'System.Debug'
+    value: 'true'
+
+  - name: StageName
+    value: 'Windows_MsHosted_Agent_Research'
+
+stages:
+  - stage: ${{ variables.StageName }}
+    displayName: ${{ variables.StageName }}
+    jobs:
+      - job: ${{ variables.StageName }}
+        displayName: ${{ variables.StageName }}
+        pool:
+          vmImage: ${{ variables.vmImageName }}
+        
+        steps:
+          - checkout: MoviesAPI
+            fetchDepth: 0
+            
+          - checkout: self
+            fetchDepth: 0
+
+          - script: |
+              echo "Agent.BuildDirectory: $(Agent.BuildDirectory)"
+              ls -lsa $(Agent.BuildDirectory)
+              echo "Finish print Agent.BuildDirectory"
+            displayName: 'Print Agent.BuildDirectory'
+
+          - script: |
+              echo "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+              ls -lsa $(System.DefaultWorkingDirectory)
+              echo "Finish print System.DefaultWorkingDirectory"
+            displayName: 'Print System.DefaultWorkingDirectory'
+
+          - script: |
+              echo "Build.ArtifactStagingDirectory: $(Build.ArtifactStagingDirectory)"
+              ls -lsa $(Build.ArtifactStagingDirectory)
+              echo "Finish print Build.ArtifactStagingDirectory"
+            displayName: 'Print Build.ArtifactStagingDirectory'
+
+          - script: |
+              echo "Common.TestResultsDirectory: $(Common.TestResultsDirectory)"
+              ls -lsa $(Common.TestResultsDirectory)
+              echo "Finish print Common.TestResultsDirectory"
+            displayName: 'Print Common.TestResultsDirectory'
+
+#          - script: |
+#              .\azure-pipelines-agent-research\scripts\agent_information.ps1
+#            workingDirectory: '$(System.DefaultWorkingDirectory)'
+#            displayName: 'Print Agent information'
+#
+#          - script: |
+#              .\azure-pipelines-agent-research\scripts\installed_programs.ps1
+#            workingDirectory: '$(System.DefaultWorkingDirectory)'
+#            displayName: 'Print installed programs'
+
+#          - script: |
+#              echo "Pipeline.Workspace folder contents:"
+#              ls -lsa $(Pipeline.Workspace)
+#              echo "Artifacts folder contents: $(Pipeline.Workspace)/a"
+#              ls -lsa "$(Pipeline.Workspace)/a"
+#              echo "Binaries folder contents: $(Pipeline.Workspace)/b"
+#              ls -lsa "$(Pipeline.Workspace)/b"
+#              echo "Source code folder contents: $(Pipeline.Workspace)/s"
+#              ls -lsa "$(Pipeline.Workspace)/s"
+#            displayName: Print Pipeline.Workspace folder
+#
+#          - script: |
+#              echo "Artifacts folder: $(Build.ArtifactStagingDirectory)"
+#            displayName: Print "Build.ArtifactStagingDirectory"
+#
+#          - bash: |
+#              echo This script could use $SYSTEM_ACCESSTOKEN
+#              echo "Non secret env var: $MY_ENV_VAR"
+#            env:
+#              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+#              MY_ENV_VAR: 'test env variable'

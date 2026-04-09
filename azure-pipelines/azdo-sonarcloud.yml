@@ -1,11 +1,3 @@
-resources:
-  repositories:
-    - repository: moviesRepo
-      type: github
-      name: kolosovpetro/movies-api-deployments-linux-iis-k8s-etc
-      endpoint: github
-      ref: refs/heads/master
-
 trigger:
   batch: true
   branches:
@@ -21,6 +13,14 @@ pr:
     include:
       - develop
       - master
+
+resources:
+  repositories:
+    - repository: moviesRepo
+      type: github
+      name: kolosovpetro/movies-api-deployments-linux-iis-k8s-etc
+      endpoint: github.com_kolosovpetro
+      ref: refs/heads/master
 
 variables:
   - name: solution

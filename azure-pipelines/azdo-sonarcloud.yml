@@ -33,10 +33,10 @@ variables:
     value: './MoviesAPI.Core/MoviesAPI.Core.csproj'
 
 stages:
-  - stage: 'Build_Test'
+  - stage: 'SonarCloud'
     jobs:
-      - job: "Build"
-        displayName: 'Build Test & Drop artifacts'
+      - job: "SonarCloud"
+        displayName: 'SonarCloud'
         pool:
           vmImage: 'ubuntu-latest'
 
@@ -73,12 +73,31 @@ stages:
               restoreArguments: '--locked-mode'
               arguments: '--verbosity minimal'
 
+          - task: SonarCloudPrepare@3
+            inputs:
+              SonarCloud: SonarCloud_Service_Connection
+              organization: kolosovpetro
+              scannerMode: dotnet
+              projectKey: kolosovpetro_sonarcloud-azure-devops-cicd
+              projectName: sonarcloud-azure-devops-cicd
+              extraProperties: |
+                  sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/**/*.trx
+                  sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/*opencover.xml
+                  sonar.exclusions=**/Properties/**, **/bin/**, **/obj/**, **/Migrations/**
+
           - task: DotNetCoreCLI@2
             displayName: 'Dotnet build $(buildConfiguration)'
             inputs:
               command: 'build'
               projects: '$(solution)'
               arguments: '-p:Version=$(version_step.semVer) --configuration $(buildConfiguration) --no-restore'
+
+          - task: SonarCloudAnalyze@3
+            inputs: {}
+
+          - task: SonarCloudPublishTest@3
+            inputs:
+              pollingTimeoutSec: "300"
 
           - task: DotNetCoreCLI@2
             displayName: 'Dotnet Publish'
